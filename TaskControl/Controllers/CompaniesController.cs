@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskControl.Entities;
+using TaskControl.Models;
+using AutoMapper;
 
 namespace TaskControl.Controllers
 {
@@ -14,31 +16,38 @@ namespace TaskControl.Controllers
     public class CompaniesController : ControllerBase
     {
         private readonly TaskControlContext _context;
+        private readonly IMapper _mapper;
 
-        public CompaniesController(TaskControlContext context)
+        public CompaniesController(TaskControlContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Companies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
+        public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompanies()
         {
-            return await _context.Companies.ToListAsync();
+            var companies = await _context.Companies.ToListAsync();
+            return null;
         }
 
         // GET: api/Companies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Company>> GetCompany(int id)
+        public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
         {
             var company = await _context.Companies.FindAsync(id);
 
+            
             if (company == null)
             {
                 return NotFound();
             }
 
-            return company;
+            var resultCompany = _mapper.Map<CompanyDTO>(company);
+
+
+            return resultCompany;
         }
 
         // PUT: api/Companies/5
@@ -75,9 +84,10 @@ namespace TaskControl.Controllers
         // POST: api/Companies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Company>> PostCompany(Company company)
+        public async Task<ActionResult<CompanyDTO>> PostCompany(CompanyDTO company)
         {
-            _context.Companies.Add(company);
+            var companyDto = _mapper.Map<Company>(company);
+            _context.Companies.Add(companyDto);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetCompany", new { id = company.Id }, company);
