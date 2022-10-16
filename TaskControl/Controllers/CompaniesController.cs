@@ -29,7 +29,8 @@ namespace TaskControl.Controllers
         public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompanies()
         {
             var companies = await _context.Companies.ToListAsync();
-            return null;
+            var companiesDto = _mapper.Map<List<Company>, List<CompanyDTO>>(companies);
+            return companiesDto;
         }
 
         // GET: api/Companies/5

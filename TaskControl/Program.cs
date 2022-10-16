@@ -1,21 +1,29 @@
 using Microsoft.EntityFrameworkCore;
 using TaskControl.Entities;
 using Microsoft.Data.SqlClient;
+using AutoMapper;
+using TaskControl.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-var conStrBuilder = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("DefaultConnection"))
-                    {
-                        Password = builder.Configuration["DbPassword"]
-                    };
+var conStrBuilder = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+var connectionString = conStrBuilder.ConnectionString;
 
 
 // TODO Check mapper config.
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+var mapperConfig = new MapperConfiguration(cfg => 
+{
+    cfg.AddProfile(new MappingProfiles());
+
+});
+
+var mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<TaskControlContext>(c => c.UseSqlServer(conStrBuilder.ConnectionString));
+builder.Services.AddDbContext<TaskControlContext>(c => c.UseSqlServer(connectionString));
 
 builder.Services.AddSwaggerGen();
 

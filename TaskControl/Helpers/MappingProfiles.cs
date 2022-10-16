@@ -8,7 +8,7 @@ namespace TaskControl.Helpers
     {
         public MappingProfiles()
         {
-            CreateMap<Company, CompanyDTO>();
+            CreateMap<CompanyDTO, Company>().ReverseMap();
         }
     }
 }
